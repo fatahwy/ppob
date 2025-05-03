@@ -1,3 +1,5 @@
+import ProductType from "./product"
+
 export default interface TransactionType {
     id: number
     product_name: string
@@ -9,8 +11,10 @@ export default interface TransactionType {
     target: string
     status: string
     token: string
+    mst_product_id: number
     created_at: string
     created_at_formatted: string
+    product: ProductType
 }
 
 export type StatusType = {

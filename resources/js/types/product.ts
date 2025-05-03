@@ -1,3 +1,5 @@
+import CategoryType from "./category"
+
 export default interface ProductType {
     id: number
     name: string
@@ -9,4 +11,5 @@ export default interface ProductType {
     status: number
     status_name?: string
     created_at: string
+    category: CategoryType
 }

@@ -43,8 +43,12 @@ class CheckTrxPrepaid extends Command
     {
         Log::info($this->description . date('d-m-y H:i:s'));
 
-        $waitingTransaction = Transaction::where('status', Transaction::STAT_PROCESS)
+        $waitingTransaction = Transaction::with('product.category')
+            ->where('status', Transaction::STAT_PROCESS)
             ->where('created_at', '>=', Carbon::now()->subDays(80)->toDateTimeString())
+            ->whereHas('product.category', function ($query) {
+                $query->where('type', 'prepaid');
+            })
             ->get();
 
         $df = new DigiflazzHelper();
@@ -86,7 +90,7 @@ class CheckTrxPrepaid extends Command
                 $product_code = $data->buyer_sku_code;
                 $sn = isset($data->sn) ? $data->sn : null;
                 $note = $data->message;
-                
+
                 if ($trx->status == Transaction::STAT_PROCESS) {
                     if ($status == 'sukses') {
                         $trx->token     = $sn;

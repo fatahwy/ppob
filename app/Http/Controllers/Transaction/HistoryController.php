@@ -26,14 +26,19 @@ class HistoryController extends Controller
         $q = $validated['q'] ?? '';
         $perPage = $validated['per_page'] ?: 10;
 
-        $models = Transaction::where('user_id', $request->user()->id)
-        ->where(function ($query) use ($q) {
-            $query->orWhere('note', 'LIKE', "%$q%")
-                ->orWhere('product_name', 'LIKE', "%$q%")
-                ->orWhere('mtrpln', 'LIKE', "%$q%")
-                ->orWhere('token', 'LIKE', "%$q%")
-                ->orWhere('total', 'LIKE', "%$q%");
-        })
+        $models = Transaction::select('id', 'product_name', 'mst_product_id', 'created_at', 'note', 'mtrpln', 'target', 'total', 'status')
+            ->with([
+                'product:id,mst_category_id',
+                'product.category:id,type',
+            ])
+            ->where('user_id', $request->user()->id)
+            ->where(function ($query) use ($q) {
+                $query->orWhere('note', 'LIKE', "%$q%")
+                    ->orWhere('product_name', 'LIKE', "%$q%")
+                    ->orWhere('mtrpln', 'LIKE', "%$q%")
+                    ->orWhere('token', 'LIKE', "%$q%")
+                    ->orWhere('total', 'LIKE', "%$q%");
+            })
             ->orderByDesc('id')
             ->paginate($perPage);
 
@@ -47,5 +52,4 @@ class HistoryController extends Controller
 
         return Inertia::render('Transaction/History/Show', compact('transaction', 'category', 'product'));
     }
-
 }

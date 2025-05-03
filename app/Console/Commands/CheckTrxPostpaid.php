@@ -49,7 +49,12 @@ class CheckTrxPostpaid extends Command
                 'status' => Transaction::STAT_FAILED,
             ]);
 
-        $waitingTransaction = Transaction::where('status', Transaction::STAT_PROCESS)->get();
+        $waitingTransaction = Transaction::with('product.category')
+            ->where('status', Transaction::STAT_FAILED)
+            ->whereHas('product.category', function ($query) {
+                $query->where('type', 'postpaid');
+            })
+            ->get();
 
         $df = new DigiflazzHelper();
 

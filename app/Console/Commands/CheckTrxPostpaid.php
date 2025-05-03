@@ -50,7 +50,7 @@ class CheckTrxPostpaid extends Command
             ]);
 
         $waitingTransaction = Transaction::with('product.category')
-            ->where('status', Transaction::STAT_FAILED)
+            ->where('status', Transaction::STAT_PROCESS)
             ->whereHas('product.category', function ($query) {
                 $query->where('type', 'postpaid');
             })
